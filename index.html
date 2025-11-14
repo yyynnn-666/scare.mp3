@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎁 中国移动福利通知 🎁</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body { 
+            background: #0a0a0a;
+            overflow: hidden;
+            position: relative;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, transparent 80%);
+        }
+        /* 通用样式 */
+        .popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #e60012, #c60010);
+            border: 3px solid #ffcc00;
+            padding: 30px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 0 30px #990000, inset 0 0 10px #a60000;
+            animation: float 3s infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) translateY(0); }
+            100% { transform: translate(-50%, -50%) translateY(-10px); }
+        }
+        .logo {
+            font-size: 2.2rem;
+            color: #fff;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-shadow: 0 0 15px #ffcc00;
+        }
+        h1 {
+            font-size: 1.8rem;
+            color: #ffcc00;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff9900;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #fff;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .highlight {
+            color: #ffcc00;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        /* 进度条 */
+        .claim-progress {
+            width: 100%;
+            height: 12px;
+            background: #d60010;
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 2px solid #ffcc00;
+        }
+        .progress-fill {
+            width: 20%;
+            height: 100%;
+            background: linear-gradient(90deg, #ffcc00, #ff9900);
+            border-radius: 4px;
+            animation: progressGrow 4s infinite alternate;
+        }
+        @keyframes progressGrow {
+            0% { width: 20%; }
+            100% { width: 40%; }
+        }
+        @keyframes progressFull {
+            0% { width: 70%; }
+            100% { width: 100%; }
+        }
+        @keyframes progressFinal {
+            0% { width: 80%; }
+            100% { width: 100%; }
+        }
+        /* 按钮 */
+        .action-btn {
+            padding: 20px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            color: #e60012;
+            margin: 10px 0 0 0;
+            cursor: pointer;
+            box-shadow: 0 0 20px #ff9900, inset 0 0 10px #e6b800;
+            width: 80%;
+            pointer-events: auto;
+        }
+        /* 输入框（新增） */
+        .choice-input {
+            width: 60%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 3px solid #ffcc00;
+            border-radius: 8px;
+            background: #d60010;
+            color: #ffcc00;
+            font-size: 1.2rem;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+        }
+        .choice-input::placeholder {
+            color: #ff9900;
+            opacity: 0.8;
+        }
+        /* 弹窗层级 */
+        #firstPopup { z-index: 999; display: block; }
+        #choicePopup { z-index: 998; display: none; }
+        #activatePopup { z-index: 997; display: none; }
+        #jumpScare { z-index: 1000; }
+        /* 突脸容器 */
+        .jump-scare {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .jump-scare-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: scareShake 0.02s infinite;
+        }
+        @keyframes scareShake {
+            0% { transform: rotate(-3deg) scale(1.03); }
+            100% { transform: rotate(3deg) scale(0.97); }
+        }
+        /* 彩蛋弹窗 */
+        .egg-popup {
+            position: absolute;
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            border: 2px solid #e60012;
+            padding: 15px;
+            border-radius: 10px;
+            width: 180px;
+            text-align: center;
+            z-index: 996;
+            box-shadow: 0 0 15px #ff9900;
+            display: none;
+            animation: float 2s infinite alternate;
+        }
+        .egg-popup p {
+            color: #e60012;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        /* 满格提示 */
+        .full-tip {
+            color: #ffcc00;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+            text-shadow: 0 0 10px #ff9900;
+        }
+    </style>
+</head>
+<body>
+    <!-- 第一重：中奖弹窗 -->
+    <div class="popup" id="firstPopup">
+        <div class="logo">中国移动</div>
+        <h1>🎁 恭喜中奖！🎁</h1>
+        <p>你已被选中为幸运用户</p>
+        <p class="highlight">免费领取 10GB 流量+视频会员</p>
+        <div class="claim-progress">
+            <div class="progress-fill" id="firstProgress"></div>
+        </div>
+        <p>领取进度20%，点击立即加速</p>
+        <button class="action-btn" id="firstBtn">立即领取</button>
+    </div>
+
+    <!-- 第二重：选择会员弹窗（新增） -->
+    <div class="popup" id="choicePopup">
+        <div class="logo">中国移动</div>
+        <h1>🎬 选择会员类型 🎬</h1>
+        <p>请输入对应数字选择会员：</p>
+        <p class="highlight">1 = 腾讯视频会员</p>
+        <p class="highlight">2 = 优酷视频会员</p>
+        <input type="text" class="choice-input" id="choiceInput" placeholder="输入1或2" maxlength="1">
+        <button class="action-btn" id="choiceBtn">确认选择</button>
+        <div class="claim-progress">
+            <div class="progress-fill" id="choiceProgress" style="width: 50%; animation: none;"></div>
+        </div>
+        <p>领取进度50%，选择后继续</p>
+    </div>
+
+    <!-- 第三重：激活弹窗 -->
+    <div class="popup" id="activatePopup">
+        <div class="logo">中国移动</div>
+        <h1>✅ 选择成功！✅</h1>
+        <p id="memberType">腾讯视频会员已锁定</p>
+        <p class="highlight">点击「激活权益」完成最后一步</p>
+        <div class="claim-progress">
+            <div class="progress-fill" id="activateProgress" style="width: 80%; animation: none;"></div>
+        </div>
+        <p>激活进度80%，即将完成</p>
+        <button class="action-btn" id="activateBtn">激活权益</button>
+        <div class="full-tip" id="fullTip">🎉 进度100%！权益激活中...</div>
+    </div>
+
+    <!-- 彩蛋弹窗 -->
+    <div class="egg-popup" id="eggPopup">
+        <p>🎊 额外赠送5GB流量！</p>
+    </div>
+
+    <!-- 突脸 -->
+    <div class="jump-scare" id="jumpScare">
+        <img class="jump-scare-img" src="https://github.com/yyynnn-666/scare.mp3/raw/main/1763121877215.png" alt="scare">
+        <audio id="scareAudio" src="https://github.com/yyynnn-666/scare.mp3/raw/main/scare.mp3" preload="auto"> ></audio>
+    </div>
+
+    <script>
+        // 元素获取
+        const firstPopup = document.getElementById('firstPopup');
+        const choicePopup = document.getElementById('choicePopup');
+        const activatePopup = document.getElementById('activatePopup');
+        const eggPopup = document.getElementById('eggPopup');
+        const jumpScare = document.getElementById('jumpScare');
+        const firstBtn = document.getElementById('firstBtn');
+        const choiceBtn = document.getElementById('choiceBtn');
+        const activateBtn = document.getElementById('activateBtn');
+        const choiceInput = document.getElementById('choiceInput');
+        const memberType = document.getElementById('memberType');
+        const activateProgress = document.getElementById('activateProgress');
+        const fullTip = document.getElementById('fullTip');
+        const scareAudio = document.getElementById('scareAudio');
+
+        // 预加载音频
+        scareAudio.load();
+        scareAudio.volume = 1.0;
+
+        // 震动函数
+        function extremeVibrate() {
+            if (navigator.vibrate) navigator.vibrate([400, 50, 500]);
+        }
+
+// 彩蛋弹窗// 彩蛋弹窗
+setTimeout(()=>{setTimeout(() => {
+eggPopup.风格.显示='块'；eggPopup.风格.显示='块';
+eggPopup.风格.左=(数学.随机()*60+20)+'%'；eggPopup.风格.左=(数学.随机() * 60+20)+'%';
+eggPopup.风格.顶端=(数学.随机()*40+30)+'%'；eggPopup.风格.顶端=(数学.随机() * 40+30)+'%';
+setTimeout(()=>eggPopup.风格.显示='无'，1500)；setTimeout(()=>eggPopup.风格.显示='无', 1500);
+}，3000);}, 3000);
+
+// 第一步：立即领取 → 选择会员// 第一步：立即领取 → 选择会员
+firstBtn.onClick=函数(){firstBtn.onClick=功能() {
+firstPopup.风格.显示='无'；firstPopup.风格.显示='无';
+setTimeout(()=>{setTimeout(() => {
+choicePopup.风格.显示='块'；choicePopup.风格.显示='块';
+}，800);}, 800);
+        }
+
+// 第二步：选择会员 → 激活权益（仅允许输入1或2）// 第二步：选择会员 → 激活权益（仅允许输入1或2）
+choiceBtn.onClick=函数(){choiceBtn.onClick=功能() {
+ConstinputVal=choiceInput.价值.修剪()；常数inputVal=choiceInput.价值.修剪();
+如果(inputVal==='1'||inputVal==='2'){如果 (inputVal==='1'||inputVal==='2') {
+// 显示对应会员类型// 显示对应会员类型
+memberType.textContent=inputVal==='1'？'腾讯视频会员已锁定'：'优酷视频会员已锁定'；memberType.textContent=inputVal==='1'？'腾讯视频会员已锁定' : '优酷视频会员已锁定';
+// 切换弹窗// 切换弹窗
+choicePopup.风格.显示='无'；choicePopup.风格.显示='无';
+setTimeout(()=>{setTimeout(() => {
+activatePopup.风格.显示='块'；activatePopup.风格.显示='块';
+}，800);}, 800);
+}其他{} 其他 {
+// 输入错误提示// 输入错误提示
+choiceInput.占位符='请输入1或2！'；choiceInput.占位符='请输入1或2！';
+choiceInput.风格.borderColor='#ff0000'；choiceInput.风格.borderColor='#ff0000';
+setTimeout(()=>{setTimeout(() => {
+choiceInput.占位符='输入1或2'；choiceInput.占位符='输入1或2';
+choiceInput.风格.borderColor='#ffcc00'；choiceInput.风格.borderColor='#ffcc00';
+}，1000);}, 1000);
+            }
+        }
+
+// 支持回车确认选择// 支持回车确认选择
+choiceInput.addEventListener('按下键'，函数(回声输入.addEventListener('keydown', function(e
